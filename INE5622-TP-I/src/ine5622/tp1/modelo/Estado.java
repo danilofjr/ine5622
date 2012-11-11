@@ -20,12 +20,48 @@ public class Estado {
         this.estadoFinal = estadoFinal;
         this.simbolos = simbolos;
         this.estadosAlcancaveis = new Estado[estadosAlcancaveis.length];
-        for(Estado e : estadosAlcancaveis){
-           this.estadosAlcancaveis[] 
-        }
-        
-        this.estadosAlcancaveis = estadosAlcancaveis;
+//        for(Estado e : estadosAlcancaveis){
+//           this.estadosAlcancaveis[] 
+//        }
+//        
+//        this.estadosAlcancaveis = estadosAlcancaveis;
     }
+    
+    public Estado(String id, boolean estadoInicial, boolean estadoFinal){
+        this.id = id;
+        this.estadoInicial = estadoInicial;
+        this.estadoFinal = estadoFinal;
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public boolean isEstadoInicial() {
+        return estadoInicial;
+    }
+
+    public void setEstadoInicial(boolean estadoInicial) {
+        this.estadoInicial = estadoInicial;
+    }
+
+    public boolean isEstadoFinal() {
+        return estadoFinal;
+    }
+
+    public void setEstadoFinal(boolean estadoFinal) {
+        this.estadoFinal = estadoFinal;
+    }
+
+    
+
+    
+    
+    
             
     
     

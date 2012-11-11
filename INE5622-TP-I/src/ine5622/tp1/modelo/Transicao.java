@@ -2,7 +2,7 @@ package ine5622.tp1.modelo;
 
 /**
  *
- * @author Danilo
+ * Classe que define uma transicao do automato finito
  */
 public class Transicao {
     
@@ -10,7 +10,11 @@ public class Transicao {
     private Estado estadoDestino; //estados de destino que deriva o simbolo
     private String simbolo; //simbolo gerado/reconhecido pela transicao
     
-    public Transicao (String simbolo){
+//    public Transicao (String simbolo){
+//        this.simbolo=simbolo;        
+//    }
+    
+    public Transicao (Estado estadoOrigem, Estado estadoDestino, String simbolo){
         this.simbolo=simbolo;        
     }
 
