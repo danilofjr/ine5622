@@ -27,7 +27,31 @@ public class Teste {
         Transicao t2 = new Transicao(q0, q0, "b");
         Transicao t3 = new Transicao(q0, q1, "a");
         Transicao t4 = new Transicao(q1, q2, "b");
-        Transicao t5 = new Transicao(q2, q3, "b");
+        Transicao t5 = new Transicao(q2, q3, "b");          
+
+        //define os estados alcancaveis a partir do estado q
+        ArrayList<Transicao> tq0 = new ArrayList();
+        tq0.add(t1);
+        tq0.add(t2);
+        tq0.add(t3);
+        q0.setEstadosAlcancaveis(tq0);        
+        
+        ArrayList<Transicao> tq1 = new ArrayList();
+        tq1.add(t4);
+        q1.setEstadosAlcancaveis(tq1);        
+        
+        ArrayList<Transicao> tq2 = new ArrayList();
+        tq2.add(t5);
+        q2.setEstadosAlcancaveis(tq2);
+        //System.out.println(tq2.toString());
+        
+        //q3.setEstadosAlcancaveis(transicoes);
+
+        //define os simbolos gerados/reconhecidos a partir do estado q
+        q0.setSimbolos(tq0);
+        q1.setSimbolos(tq1);
+        q2.setSimbolos(tq2);        
+        //q3.setSimbolos(transicoes);
 
         //Cria objetos necessarios para criar o AF
         ArrayList<Estado> estados = new ArrayList(); //estados do automato
@@ -40,24 +64,8 @@ public class Teste {
         transicoes.add(t2);
         transicoes.add(t3);
         transicoes.add(t4);
-        transicoes.add(t5);
-
-        for (Transicao t : transicoes) {
-            System.out.println(t.toString());
-        }
-
-        //define os estados alcancaveis a partir do estado q
-        q0.setEstadosAlcancaveis(transicoes);
-        q1.setEstadosAlcancaveis(transicoes);
-        q2.setEstadosAlcancaveis(transicoes);
-        q3.setEstadosAlcancaveis(transicoes);
-
-        //define os simbolos gerados/reconhecidos a partir do estado q
-        q0.setSimbolos(transicoes);
-        q1.setSimbolos(transicoes);
-        q2.setSimbolos(transicoes);
-        q3.setSimbolos(transicoes);
-
+        transicoes.add(t5);    
+        
         //Cria o AFND
         //AutomatoFinito(ArrayList<Estado> estados, ArrayList<Transicao> transicoes)
         AutomatoFinito afnd = new AutomatoFinito(estados, transicoes);
@@ -79,5 +87,8 @@ public class Teste {
         //Converte o AF em GR
         afutil.converteAF2GR(afnd);//IMPLEMENTAR!
 
+        for (Transicao t : transicoes) {
+            System.out.println(t.toString());
+        }
     }
 }
