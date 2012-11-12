@@ -30,13 +30,22 @@ public class Teste {
         
         //Cria objetos necessarios para criar o AF
         ArrayList<Estado> estados = new ArrayList(); //estados do automato
+        estados.add(q0);
+        estados.add(q1);
+        estados.add(q2);
+        estados.add(q3);
         ArrayList<Transicao> transicoes = new ArrayList(); //transicoes do automato
+        transicoes.add(t1);
+        transicoes.add(t2);
+        transicoes.add(t3);
+        transicoes.add(t4);
+        transicoes.add(t5);
         
         //Cria o AFND
         //AutomatoFinito(ArrayList<Estado> estados, ArrayList<Transicao> transicoes)
         AutomatoFinito afnd = new AutomatoFinito(estados, transicoes);
         
-        System.out.println(afnd.toString());
+        afnd.toString(afnd);
         
         //determinizar o AFND
         
