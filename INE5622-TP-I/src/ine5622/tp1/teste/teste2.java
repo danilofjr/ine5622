@@ -10,4 +10,6 @@ package ine5622.tp1.teste;
  */
 public class teste2 {
     
+    //Esta classe não deve existir
+    
 }
