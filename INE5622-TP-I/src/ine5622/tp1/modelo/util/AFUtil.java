@@ -35,6 +35,9 @@ public class AFUtil {
      * @return [verificar necessidade de retorno]
      */
     public void determinizarAF(AutomatoFinito af) {
+        //
+        
+        
     }
 
     /**
