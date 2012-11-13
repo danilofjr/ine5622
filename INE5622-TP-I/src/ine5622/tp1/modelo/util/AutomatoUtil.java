@@ -7,7 +7,7 @@ import ine5622.tp1.modelo.GramaticaRegular;
  *
  * Classe com metodos de manipulacao de AF
  */
-public class AFUtil {
+public class AutomatoUtil {
 
     /**
      * Le o automato finito passado como parametro

@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * Classe com metodos de manipulacao de GR
  */
-public class GRUtil {
+public class GramaticaUtil {
 
     /**
      * Le a gramatica regular passada como parametro

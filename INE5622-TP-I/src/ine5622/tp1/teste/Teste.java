@@ -3,8 +3,8 @@ package ine5622.tp1.teste;
 import ine5622.tp1.modelo.AutomatoFinito;
 import ine5622.tp1.modelo.Estado;
 import ine5622.tp1.modelo.Transicao;
-import ine5622.tp1.modelo.util.AFUtil;
-import ine5622.tp1.modelo.util.GRUtil;
+import ine5622.tp1.modelo.util.AutomatoUtil;
+import ine5622.tp1.modelo.util.GramaticaUtil;
 import java.util.ArrayList;
 
 /**
@@ -80,10 +80,10 @@ public class Teste {
         }
 
         //Instancia um objeto da classe que contem metodos de manipulacao de AF
-        AFUtil afutil = new AFUtil();
+        AutomatoUtil afutil = new AutomatoUtil();
 
         //Instancia um objeto da classe que contem metodos de manipulacao de GR
-        GRUtil grutil = new GRUtil();
+        GramaticaUtil grutil = new GramaticaUtil();
 
         //Converte o AFND em AF
         afutil.determinizarAF(afnd);//IMPLEMENTAR!
