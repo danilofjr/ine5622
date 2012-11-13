@@ -42,15 +42,17 @@ public class Teste {
         
         ArrayList<Transicao> tq2 = new ArrayList();
         tq2.add(t5);
-        q2.setEstadosAlcancaveis(tq2);
-        //System.out.println(tq2.toString());
+        q2.setEstadosAlcancaveis(tq2);  
         
+        //q3 não tem estados alcancaveis
         //q3.setEstadosAlcancaveis(transicoes);
 
         //define os simbolos gerados/reconhecidos a partir do estado q
         q0.setSimbolos(tq0);
         q1.setSimbolos(tq1);
-        q2.setSimbolos(tq2);        
+        q2.setSimbolos(tq2);   
+        
+        //q3 não tem transicoes
         //q3.setSimbolos(transicoes);
 
         //Cria objetos necessarios para criar o AF
@@ -72,10 +74,15 @@ public class Teste {
 
         //Imprime o automato de forma tabular
         afnd.toString();
+        //Imprime as transicoes do automato
+        for (Transicao t : transicoes) {
+            System.out.println(t.toString());
+        }
 
         //Instancia um objeto da classe que contem metodos de manipulacao de AF
         AFUtil afutil = new AFUtil();
 
+        //Instancia um objeto da classe que contem metodos de manipulacao de GR
         GRUtil grutil = new GRUtil();
 
         //Converte o AFND em AF
@@ -87,8 +94,5 @@ public class Teste {
         //Converte o AF em GR
         afutil.converteAF2GR(afnd);//IMPLEMENTAR!
 
-        for (Transicao t : transicoes) {
-            System.out.println(t.toString());
-        }
     }
 }

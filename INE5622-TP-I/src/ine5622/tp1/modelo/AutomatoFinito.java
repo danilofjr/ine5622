@@ -19,7 +19,6 @@ public class AutomatoFinito {
         this.estados = estados;
         this.transicoes = transicoes;
         this.simbolos = listaSimbolos();
-
     }
 
     /**
@@ -157,6 +156,10 @@ public class AutomatoFinito {
         int linhas = estados.size() + 1;
         int colunas = simbolos.size() + 1;
         String[][] tabela = new String[linhas][colunas];
+        
+        //Simbolos indicativos de estado inicial ou estado final
+        String estFinal = "*";
+        String estInicial = "->";
 
         //define os rotulos das linhas e das colunas da tabela
         for (int linha = 0; linha < linhas; linha++) {
@@ -172,29 +175,36 @@ public class AutomatoFinito {
 
                 if (linha > 0 && coluna == 0) {
                     tabela[linha][coluna] = estados.get(linha - 1).getId();
+                    if(estados.get(linha - 1).isEstadoFinal()){
+                        //se o estado é final, acrescenta '*' a sua representacao
+                        tabela[linha][coluna]=estFinal.concat(tabela[linha][coluna]);
+                    }
+                    if(estados.get(linha - 1).isEstadoInicial()){
+                        //se o estado é inicial, acrescenta '->' a sua representacao
+                        tabela[linha][coluna]=estInicial.concat(tabela[linha][coluna]);
+                    }
                 }
             }
         }
 
         //define os estados na tabela
         for (int linha = 1; linha < linhas; linha++) {
-            for (int coluna = 1; coluna < colunas; coluna++) {
-                for (Transicao t : transicoes) {
-                    if (t.getEstadoOrigem().getId().equals(tabela[linha][0])) {
-                        for (String s : simbolos) {
-                            if (s.equals(tabela[0][coluna])) {
-                                if (tabela[linha][coluna] == null) {
-                                    tabela[linha][coluna] = t.getEstadoDestino().getId();
-                                } else {
-                                    tabela[linha][coluna] = tabela[linha][coluna].concat(t.getEstadoDestino().getId());
-                                }
+            for (int coluna = 1; coluna < colunas; coluna++){
+                for(Transicao t : transicoes){
+                    if((tabela[linha][0]).contains(t.getEstadoOrigem().getId())){
+                        if(t.getSimbolo().equals(tabela[0][coluna])){
+                            if (tabela[linha][coluna] == null) {
+                                tabela[linha][coluna]=t.getEstadoDestino().getId();
                             }
-                        }
+                            else{
+                                tabela[linha][coluna] = tabela[linha][coluna].concat(t.getEstadoDestino().getId());
+                            }                            
+                        }                       
                     }
                 }
-            }
+            }            
         }
-
+        
         //imprime a tabela do automato
         for (int linha = 0; linha < linhas; linha++) {
             boolean linhaMudou = false;
@@ -211,8 +221,8 @@ public class AutomatoFinito {
                 }
                 linhaMudou = true;
                 System.out.println();
-            }
-        }
+            }            
+        }        
         return null;
     }
 }
