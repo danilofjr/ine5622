@@ -12,6 +12,8 @@ public class AutomatoFinito {
     private ArrayList<Estado> estados; //estados do automato
     private ArrayList<Transicao> transicoes; //transicoes do automato
     private ArrayList<String> simbolos; //simbolos gerados/reconhecidos pelo automato
+    private ArrayList<Estado> estadosAlcancaveis; //lista de estados alcancaveis do automato
+    private ArrayList<Estado> estadosVivos; //lista de estados vivos do automato
 
     public AutomatoFinito(ArrayList<Estado> estados, ArrayList<Transicao> transicoes) {
         this.estados = new ArrayList();
@@ -127,6 +129,106 @@ public class AutomatoFinito {
     }
 
     /**
+     * Verifica quais os estados do automato sao alcancaveis a partir do estado inicial
+     *
+     * @param
+     * @return
+     */
+    public void verificaEstadosAlcancaveis() {
+        //procura o estado inicial e adiciona os estados alcancaveis a partir dele ao list de estados alcancaveis
+        for (Transicao t : this.transicoes) {
+            //verifica se o estado de origem 'e' da transicao 't' é inicial
+            if (t.getEstadoOrigem().isEstadoInicial()) {
+                //adiciona o estado de origem ao list de estados alcancaveis, se nao duplicado (um estado inicial eh sempre alcancavel)
+                if (!this.estadosAlcancaveis.contains(t.getEstadoOrigem())) {
+                    this.estadosAlcancaveis.add(t.getEstadoOrigem());
+                }
+                //adiciona o estado de destino ao list de estados alcancaveis, se nao duplicado
+                if (!this.estadosAlcancaveis.contains(t.getEstadoDestino())) {
+                    this.estadosAlcancaveis.add(t.getEstadoDestino());
+                }
+            }
+        }
+        //procura novos estados alcancaveis a partir do list de estados alcancaveis
+        for (Estado e : this.estadosAlcancaveis) {
+            for (Transicao t : this.transicoes) {
+                if (t.getEstadoOrigem() == e) {
+                    if (!this.estadosAlcancaveis.contains(t.getEstadoDestino())) {
+                        this.estadosAlcancaveis.add(t.getEstadoDestino());
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Verifica quais os estados do automato alcancam estados finais
+     *
+     * @param
+     * @return
+     */
+    public void verificaEstadosVivos(){
+        //procura estados finais e os adiciona ao list de estados vivos
+        for (Transicao t : this.transicoes){
+            //verifica se o estado de origem 'e' da transicao 't' é final
+            if(t.getEstadoOrigem().isEstadoFinal()){
+                //adiciona o estado de origem ao list de estados finais, se nao duplicado (um estado final eh sempre vivo)
+                if (!this.estadosVivos.contains(t.getEstadoOrigem())) {
+                    this.estadosVivos.add(t.getEstadoOrigem());
+                }                
+            }
+        }
+        //procura novos estados vivos a partir do list de estados vivos
+        for (Estado e : this.estadosVivos) {
+            for (Transicao t : this.transicoes) {
+                if (t.getEstadoDestino() == e) {
+                    if (!this.estadosVivos.contains(t.getEstadoOrigem())) {
+                        this.estadosVivos.add(t.getEstadoOrigem());
+                    }
+                }
+            }
+        }
+    }    
+    
+   /**
+     * Elimina os estados do automato que nao sao alcancaveis a partir do estado inicial
+     *
+     * @param
+     * @return
+     */
+    public void eliminaEstadosInalcancaveis(){
+        //faz a intersecção entre as lists 'estados' e 'estadosAlcancaveis'
+        this.estados.retainAll(this.estadosAlcancaveis);
+        //elimina as transicoes de estados inalcancaveis
+        for (Estado e : this.estados) {
+            for (Transicao t : this.transicoes) {
+                if(!this.estados.contains(t.getEstadoOrigem())){
+                    this.transicoes.remove(t);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Elimina os estados do automato que nao alcancam estados finais
+     *
+     * @param
+     * @return
+     */
+    public void eliminaEstadosMortos(){
+        //faz a intersecção entre as lists 'estados' e 'estadosVivos'
+        this.estados.retainAll(this.estadosVivos);
+        //elimina as transicoes de estados vivos
+        for (Estado e : this.estados) {
+            for (Transicao t : this.transicoes) {
+                if(!this.estados.contains(t.getEstadoOrigem())){
+                    this.transicoes.remove(t);
+                }
+            }
+        }
+    }
+
+    /**
      * Verifica e lista quais simbolos sao gerados/reconhecidos pelo automato
      *
      * @return uma lista de simbolos gerados/reconhecidos pelo automato
@@ -156,7 +258,7 @@ public class AutomatoFinito {
         int linhas = estados.size() + 1;
         int colunas = simbolos.size() + 1;
         String[][] tabela = new String[linhas][colunas];
-        
+
         //Simbolos indicativos de estado inicial ou estado final
         String estFinal = "*";
         String estInicial = "->";
@@ -175,13 +277,13 @@ public class AutomatoFinito {
 
                 if (linha > 0 && coluna == 0) {
                     tabela[linha][coluna] = estados.get(linha - 1).getId();
-                    if(estados.get(linha - 1).isEstadoFinal()){
+                    if (estados.get(linha - 1).isEstadoFinal()) {
                         //se o estado é final, acrescenta '*' a sua representacao
-                        tabela[linha][coluna]=estFinal.concat(tabela[linha][coluna]);
+                        tabela[linha][coluna] = estFinal.concat(tabela[linha][coluna]);
                     }
-                    if(estados.get(linha - 1).isEstadoInicial()){
+                    if (estados.get(linha - 1).isEstadoInicial()) {
                         //se o estado é inicial, acrescenta '->' a sua representacao
-                        tabela[linha][coluna]=estInicial.concat(tabela[linha][coluna]);
+                        tabela[linha][coluna] = estInicial.concat(tabela[linha][coluna]);
                     }
                 }
             }
@@ -189,22 +291,21 @@ public class AutomatoFinito {
 
         //define os estados na tabela
         for (int linha = 1; linha < linhas; linha++) {
-            for (int coluna = 1; coluna < colunas; coluna++){
-                for(Transicao t : transicoes){
-                    if((tabela[linha][0]).contains(t.getEstadoOrigem().getId())){
-                        if(t.getSimbolo().equals(tabela[0][coluna])){
+            for (int coluna = 1; coluna < colunas; coluna++) {
+                for (Transicao t : transicoes) {
+                    if ((tabela[linha][0]).contains(t.getEstadoOrigem().getId())) {
+                        if (t.getSimbolo().equals(tabela[0][coluna])) {
                             if (tabela[linha][coluna] == null) {
-                                tabela[linha][coluna]=t.getEstadoDestino().getId();
-                            }
-                            else{
+                                tabela[linha][coluna] = t.getEstadoDestino().getId();
+                            } else {
                                 tabela[linha][coluna] = tabela[linha][coluna].concat(t.getEstadoDestino().getId());
-                            }                            
-                        }                       
+                            }
+                        }
                     }
                 }
-            }            
+            }
         }
-        
+
         //imprime a tabela do automato
         for (int linha = 0; linha < linhas; linha++) {
             boolean linhaMudou = false;
@@ -221,8 +322,8 @@ public class AutomatoFinito {
                 }
                 linhaMudou = true;
                 System.out.println();
-            }            
-        }        
+            }
+        }
         return null;
     }
 }

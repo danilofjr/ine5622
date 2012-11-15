@@ -34,23 +34,23 @@ public class Teste {
         tq0.add(t1);
         tq0.add(t2);
         tq0.add(t3);
-        q0.setEstadosAlcancaveis(tq0);        
+//        q0.setEstadosAlcancaveis(tq0);        
         
         ArrayList<Transicao> tq1 = new ArrayList();
         tq1.add(t4);
-        q1.setEstadosAlcancaveis(tq1);        
+//        q1.setEstadosAlcancaveis(tq1);        
         
         ArrayList<Transicao> tq2 = new ArrayList();
         tq2.add(t5);
-        q2.setEstadosAlcancaveis(tq2);  
+//        q2.setEstadosAlcancaveis(tq2);  
         
         //q3 não tem estados alcancaveis
         //q3.setEstadosAlcancaveis(transicoes);
 
         //define os simbolos gerados/reconhecidos a partir do estado q
-        q0.setSimbolos(tq0);
-        q1.setSimbolos(tq1);
-        q2.setSimbolos(tq2);   
+//        q0.setSimbolos(tq0);
+//        q1.setSimbolos(tq1);
+//        q2.setSimbolos(tq2);   
         
         //q3 não tem transicoes
         //q3.setSimbolos(transicoes);

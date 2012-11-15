@@ -11,8 +11,8 @@ public class Estado {
     private String id; //identificador do estado    
     private boolean estadoInicial; //identifica se o estado eh inicial
     private boolean estadoFinal; //identifica se o estado eh final
-    private ArrayList<String> simbolos; //simbolos gerados a partir do estado ??necessario?? ja que tem transicoes[]?
-    private ArrayList<Estado> estadosAlcancaveis; //estados alcancaveis a partir deste ??necessario?? ja que tem transicoes[]?
+    //private ArrayList<String> simbolos; //simbolos gerados a partir do estado ??necessario?? ja que tem transicoes[]?
+    //private ArrayList<Estado> estadosAlcancaveis; //estados alcancaveis a partir deste ??necessario?? ja que tem transicoes[]?
     //private Transicao[] transicoes; //transicoes de um estado
     //private boolean estadoEpsilon; //necessario?   
 
@@ -46,32 +46,32 @@ public class Estado {
         this.estadoFinal = estadoFinal;
     }
 
-    public ArrayList<Estado> getEstadosAlcancaveis() {
-        return estadosAlcancaveis;
-    }
-
-    public void setEstadosAlcancaveis(ArrayList<Transicao> transicoes) {
-        this.estadosAlcancaveis = new ArrayList();
-        for (Transicao t : transicoes) {
-            if (t.getEstadoOrigem() == this) {
-                this.estadosAlcancaveis.add(t.getEstadoDestino());
-            }
-        }
-    }
-
-    public ArrayList<String> getSimbolos() {
-        return simbolos;
-    }
-
-    public void setSimbolos(ArrayList<Transicao> transicoes) {
-        this.simbolos = new ArrayList();
-        for (Transicao t : transicoes) {
-            if (t.getEstadoOrigem() == this) {
-                this.simbolos.add(t.getSimbolo());
-            }
-        }
-        this.simbolos = simbolos;
-    }
+//    public ArrayList<Estado> getEstadosAlcancaveis() {
+//        return estadosAlcancaveis;
+//    }
+//
+//    public void setEstadosAlcancaveis(ArrayList<Transicao> transicoes) {
+//        this.estadosAlcancaveis = new ArrayList();
+//        for (Transicao t : transicoes) {
+//            if (t.getEstadoOrigem() == this) {
+//                this.estadosAlcancaveis.add(t.getEstadoDestino());
+//            }
+//        }
+//    }
+//
+//    public ArrayList<String> getSimbolos() {
+//        return simbolos;
+//    }
+//
+//    public void setSimbolos(ArrayList<Transicao> transicoes) {
+//        this.simbolos = new ArrayList();
+//        for (Transicao t : transicoes) {
+//            if (t.getEstadoOrigem() == this) {
+//                this.simbolos.add(t.getSimbolo());
+//            }
+//        }
+//        this.simbolos = simbolos;
+//    }
 
     public String toString() {
         String resultado = "Estado " + this.getId();
