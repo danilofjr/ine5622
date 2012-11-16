@@ -1,5 +1,6 @@
 package ine5622.tp1.modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Formatter;
 
@@ -7,7 +8,7 @@ import java.util.Formatter;
  *
  * Classe que define um automato finito
  */
-public class AutomatoFinito {
+public class AutomatoFinito implements Serializable {
 
     private ArrayList<Estado> estados; //estados do automato
     private ArrayList<Transicao> transicoes; //transicoes do automato
@@ -160,22 +161,22 @@ public class AutomatoFinito {
             }
         }
     }
-    
+
     /**
      * Verifica quais os estados do automato alcancam estados finais
      *
      * @param
      * @return
      */
-    public void verificaEstadosVivos(){
+    public void verificaEstadosVivos() {
         //procura estados finais e os adiciona ao list de estados vivos
-        for (Transicao t : this.transicoes){
+        for (Transicao t : this.transicoes) {
             //verifica se o estado de origem 'e' da transicao 't' é final
-            if(t.getEstadoOrigem().isEstadoFinal()){
+            if (t.getEstadoOrigem().isEstadoFinal()) {
                 //adiciona o estado de origem ao list de estados finais, se nao duplicado (um estado final eh sempre vivo)
                 if (!this.estadosVivos.contains(t.getEstadoOrigem())) {
                     this.estadosVivos.add(t.getEstadoOrigem());
-                }                
+                }
             }
         }
         //procura novos estados vivos a partir do list de estados vivos
@@ -188,44 +189,138 @@ public class AutomatoFinito {
                 }
             }
         }
-    }    
-    
-   /**
+    }
+
+    /**
      * Elimina os estados do automato que nao sao alcancaveis a partir do estado inicial
      *
      * @param
      * @return
      */
-    public void eliminaEstadosInalcancaveis(){
+    public void eliminaEstadosInalcancaveis() {
         //faz a intersecção entre as lists 'estados' e 'estadosAlcancaveis'
         this.estados.retainAll(this.estadosAlcancaveis);
         //elimina as transicoes de estados inalcancaveis
         for (Estado e : this.estados) {
             for (Transicao t : this.transicoes) {
-                if(!this.estados.contains(t.getEstadoOrigem())){
+                if (!this.estados.contains(t.getEstadoOrigem())) {
                     this.transicoes.remove(t);
                 }
             }
         }
     }
-    
+
     /**
      * Elimina os estados do automato que nao alcancam estados finais
      *
      * @param
      * @return
      */
-    public void eliminaEstadosMortos(){
+    public void eliminaEstadosMortos() {
         //faz a intersecção entre as lists 'estados' e 'estadosVivos'
         this.estados.retainAll(this.estadosVivos);
         //elimina as transicoes de estados vivos
         for (Estado e : this.estados) {
             for (Transicao t : this.transicoes) {
-                if(!this.estados.contains(t.getEstadoOrigem())){
+                if (!this.estados.contains(t.getEstadoOrigem())) {
                     this.transicoes.remove(t);
                 }
             }
         }
+    }
+
+    
+    //###teste criacao de CE com objetos
+    public void classesDeEquivalencia() {
+        //list que armazena lists que representam classes de equivalencia (CE)
+        ArrayList<ArrayList> classes = new ArrayList();
+
+        //list de estados finais
+        ArrayList<Estado> f = new ArrayList();
+
+        //list de estados nao-finais
+        ArrayList<Estado> nf = new ArrayList();
+
+        //separa os estados finais dos nao finais, adicionandos nas respectivas lists
+        for (Estado e : this.estados) {
+            if (e.isEstadoFinal()) {
+                f.add(e);
+            } else {
+                nf.add(e);
+            }
+        }
+
+        Estado eOrigem0 = f.get(0);
+        Estado eOrigem1 = f.get(1);
+
+        Estado eDestino0 = null;
+        Estado eDestino1 = null;
+
+//        Transicao t0=null;
+//        Transicao t1=null;
+
+        //list temporario para guardar os estados destino de dois estados de uma CE para
+        //auxiliar a comparacao entre os estados destino e verificar se eles pertencem a mesma CE
+        ArrayList<Estado> temp = new ArrayList();
+
+        for (int i = 0; i < this.transicoes.size(); i++) {
+            Transicao t = this.transicoes.get(i);
+            if (t.getEstadoOrigem() == eOrigem0 && t.getSimbolo().equals(this.simbolos.get(0))) {
+                temp.add(t.getEstadoDestino());
+            }
+        }        
+    }
+    
+    //###teste criacao de CE com array bidimensional
+    public void criaClassesDeEquivalencia(){
+        //cria uma tabela (array bidimensional) para representar o automado em forma de tabela
+        int linhas = estados.size() + 1;
+        int colunas = simbolos.size() + 1;
+        String[][] tabela = this.af2BiDimArray();
+        
+        //list que armazena lists que representam classes de equivalencia (CE)
+        ArrayList<ArrayList> classes = new ArrayList();
+
+        //list de estados finais
+        ArrayList<Estado> f = new ArrayList();
+
+        //list de estados nao-finais
+        ArrayList<Estado> nf = new ArrayList();
+
+        //separa os estados finais dos nao finais, adicionandos nas respectivas lists
+        for (Estado e : this.estados) {
+            if (e.isEstadoFinal()) {
+                f.add(e);
+            } else {
+                nf.add(e);
+            }
+        }
+
+        Estado eOrigem0 = f.get(0);
+        Estado eOrigem1 = f.get(1);
+
+        Estado eDestino0 = null;
+        Estado eDestino1 = null;
+        
+        //cria Strings temporarias para comparar se transicoes sao da mesma classe
+        String qa=null;
+        String qb=null;
+        for(int i=0; i<this.estados.size(); i++)
+            //comeca comparando elementos da CE dos estados finais se houver mais de 1 elemento
+            if(f.size()>1){
+                
+                if(tabela[i+1][0].equals(f.get(0).getId())){
+                    qa=tabela[i+1][1];
+                }
+                
+            }
+            //se a CE dos estados finais só contem 1 elemento, compara os elementos da CE dos nao finais
+            //apenas se houver mais de 1 elemento
+            else{
+                
+            }
+        
+        
     }
 
     /**
@@ -245,15 +340,11 @@ public class AutomatoFinito {
     }
 
     /**
-     * Retorna uma representacao do automato finito em forma de String
+     * Cria e retorna um array bidimensional do automato
      *
-     * @return uma representacao do automato finito
+     * @return um array bidimensional de Strings que representa o automato
      */
-    @Override
-    public String toString() {//AutomatoFinito af) {
-        //cria o formatador da tabela
-        Formatter formatter = new Formatter();
-
+    public String[][] af2BiDimArray() {
         //cria uma tabela (array bidimensional) para representar o automado em forma de tabela
         int linhas = estados.size() + 1;
         int colunas = simbolos.size() + 1;
@@ -305,6 +396,23 @@ public class AutomatoFinito {
                 }
             }
         }
+        return tabela;
+    }
+
+    /**
+     * Imprime uma representacao do automato finito em forma de String
+     *
+     * @return uma representacao do automato finito
+     */
+    @Override
+    public String toString() {//AutomatoFinito af) {
+        //cria o formatador da tabela
+        Formatter formatter = new Formatter();
+
+        //cria uma tabela (array bidimensional) para representar o automado em forma de tabela
+        int linhas = estados.size() + 1;
+        int colunas = simbolos.size() + 1;
+        String[][] tabela = this.af2BiDimArray();
 
         //imprime a tabela do automato
         for (int linha = 0; linha < linhas; linha++) {
