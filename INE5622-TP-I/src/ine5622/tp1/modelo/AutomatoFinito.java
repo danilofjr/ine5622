@@ -22,6 +22,8 @@ public class AutomatoFinito implements Serializable {
         this.estados = estados;
         this.transicoes = transicoes;
         this.simbolos = listaSimbolos();
+        this.estadosAlcancaveis = new ArrayList();
+        this.estadosVivos = new ArrayList();
     }
 
     /**
@@ -136,6 +138,7 @@ public class AutomatoFinito implements Serializable {
      * @return
      */
     public void verificaEstadosAlcancaveis() {
+        //ArrayList<Estado> estadosAlcancaveisTemp = new ArrayList();
         //procura o estado inicial e adiciona os estados alcancaveis a partir dele ao list de estados alcancaveis
         for (Transicao t : this.transicoes) {
             //verifica se o estado de origem 'e' da transicao 't' é inicial
@@ -148,18 +151,45 @@ public class AutomatoFinito implements Serializable {
                 if (!this.estadosAlcancaveis.contains(t.getEstadoDestino())) {
                     this.estadosAlcancaveis.add(t.getEstadoDestino());
                 }
-            }
+            }            
         }
-        //procura novos estados alcancaveis a partir do list de estados alcancaveis
+
+        System.out.println("---");
         for (Estado e : this.estadosAlcancaveis) {
-            for (Transicao t : this.transicoes) {
-                if (t.getEstadoOrigem() == e) {
-                    if (!this.estadosAlcancaveis.contains(t.getEstadoDestino())) {
-                        this.estadosAlcancaveis.add(t.getEstadoDestino());
+            System.out.println(e.toString());
+        }
+        System.out.println("---até aqui esta correto---");
+
+        //passa 3 vezes para garantir que encontrou todos os estados alcancaveis
+        int cont = 0;
+        while (cont < 2) {
+            //faz uma cópia de estadosAlcancaveis        
+            //o codigo ArrayList<Estado> estadosAlcancaveisTemp=this.estadosAlcancaveis nao copia o array estadosAlcancaveis
+            //para o array estadosAlcancaveisTemp, e sim vincula o primeiro ao segundo. Resulta em erro por acesso concorrente.
+            ArrayList<Estado> estadosAlcancaveisTemp = new ArrayList();
+            for (Estado e : this.estadosAlcancaveis) {
+                estadosAlcancaveisTemp.add(e);
+            }
+            //procura novos estados alcancaveis a partir do list de estados alcancaveis
+            for (Estado e : this.estadosAlcancaveis) {
+                for (Transicao t : this.transicoes) {
+                    if (t.getEstadoOrigem() == e) {
+                        if (!this.estadosAlcancaveis.contains(t.getEstadoDestino())) {
+                            estadosAlcancaveisTemp.add(t.getEstadoDestino());
+                        }
                     }
                 }
             }
+            this.estadosAlcancaveis = estadosAlcancaveisTemp;
+            for (Estado e : this.estadosAlcancaveis) {
+                System.out.println(e.toString());
+            }
+            cont++;
         }
+//        for(Estado e : this.estadosAlcancaveis){
+//            System.out.println(e.toString());
+//        }
+
     }
 
     /**
@@ -179,16 +209,27 @@ public class AutomatoFinito implements Serializable {
                 }
             }
         }
+        //faz uma cópia de estadosVivos        
+        //o codigo ArrayList<Estado> estadosVivosTemp=this.estadosVivos nao copia o array estadosVivos
+        //para o array estadosVivosTemp, e sim vincula o primeiro ao segundo. Resulta em erro por acesso concorrente.
+        ArrayList<Estado> estadosVivosTemp=new ArrayList();
+        for (Estado e : this.estadosAlcancaveis){
+            estadosVivosTemp.add(e);
+        }
         //procura novos estados vivos a partir do list de estados vivos
         for (Estado e : this.estadosVivos) {
             for (Transicao t : this.transicoes) {
                 if (t.getEstadoDestino() == e) {
                     if (!this.estadosVivos.contains(t.getEstadoOrigem())) {
-                        this.estadosVivos.add(t.getEstadoOrigem());
+                        estadosVivosTemp.add(t.getEstadoOrigem());
                     }
                 }
             }
         }
+        this.estadosVivos=estadosVivosTemp;
+//        for(Estado e : this.estadosVivos){
+//            System.out.println(e.toString());
+//        }
     }
 
     /**
@@ -200,14 +241,21 @@ public class AutomatoFinito implements Serializable {
     public void eliminaEstadosInalcancaveis() {
         //faz a intersecção entre as lists 'estados' e 'estadosAlcancaveis'
         this.estados.retainAll(this.estadosAlcancaveis);
+        
+        //faz uma cópia de transicoes                
+        ArrayList<Transicao> transicoesTemp=new ArrayList();
+        for (Transicao t : this.transicoes){
+            transicoesTemp.add(t);
+        }
         //elimina as transicoes de estados inalcancaveis
         for (Estado e : this.estados) {
             for (Transicao t : this.transicoes) {
                 if (!this.estados.contains(t.getEstadoOrigem())) {
-                    this.transicoes.remove(t);
+                    transicoesTemp.remove(t);
                 }
             }
         }
+        this.transicoes=transicoesTemp;        
     }
 
     /**
@@ -219,25 +267,29 @@ public class AutomatoFinito implements Serializable {
     public void eliminaEstadosMortos() {
         //faz a intersecção entre as lists 'estados' e 'estadosVivos'
         this.estados.retainAll(this.estadosVivos);
+        
+        //faz uma cópia de transicoes                
+        ArrayList<Transicao> transicoesTemp=new ArrayList();
+        for (Transicao t : this.transicoes){
+            transicoesTemp.add(t);
+        }
         //elimina as transicoes de estados vivos
         for (Estado e : this.estados) {
             for (Transicao t : this.transicoes) {
                 if (!this.estados.contains(t.getEstadoOrigem())) {
-                    this.transicoes.remove(t);
+                    transicoesTemp.remove(t);
                 }
             }
         }
+        this.transicoes=transicoesTemp;  
     }
 
-    
     //###teste criacao de CE com objetos
     public void classesDeEquivalencia() {
         //list que armazena lists que representam classes de equivalencia (CE)
         ArrayList<ArrayList> classes = new ArrayList();
-
         //list de estados finais
         ArrayList<Estado> f = new ArrayList();
-
         //list de estados nao-finais
         ArrayList<Estado> nf = new ArrayList();
 
@@ -250,77 +302,46 @@ public class AutomatoFinito implements Serializable {
             }
         }
 
-        Estado eOrigem0 = f.get(0);
-        Estado eOrigem1 = f.get(1);
+        //variaveis para controlar a iteracao nos arrays this.estados, this.transicoes, this.simbolos e um dos arrays de CE
+        int contEstados = 0;
+        int contTransicoes = 0;
+        int contSimbolos = 0;
+        int contK = 0;
 
-        Estado eDestino0 = null;
-        Estado eDestino1 = null;
+        //transicoes temporarias para comparacao
+        Transicao ta = null;
+        Transicao tb = null;
 
-//        Transicao t0=null;
-//        Transicao t1=null;
+        //armazena temporariamente transicoes de dois estados para comparacao       
+        ArrayList<Transicao> trans = new ArrayList();
 
-        //list temporario para guardar os estados destino de dois estados de uma CE para
-        //auxiliar a comparacao entre os estados destino e verificar se eles pertencem a mesma CE
-        ArrayList<Estado> temp = new ArrayList();
 
-        for (int i = 0; i < this.transicoes.size(); i++) {
-            Transicao t = this.transicoes.get(i);
-            if (t.getEstadoOrigem() == eOrigem0 && t.getSimbolo().equals(this.simbolos.get(0))) {
-                temp.add(t.getEstadoDestino());
-            }
-        }        
-    }
-    
-    //###teste criacao de CE com array bidimensional
-    public void criaClassesDeEquivalencia(){
-        //cria uma tabela (array bidimensional) para representar o automado em forma de tabela
-        int linhas = estados.size() + 1;
-        int colunas = simbolos.size() + 1;
-        String[][] tabela = this.af2BiDimArray();
-        
-        //list que armazena lists que representam classes de equivalencia (CE)
-        ArrayList<ArrayList> classes = new ArrayList();
-
-        //list de estados finais
-        ArrayList<Estado> f = new ArrayList();
-
-        //list de estados nao-finais
-        ArrayList<Estado> nf = new ArrayList();
-
-        //separa os estados finais dos nao finais, adicionandos nas respectivas lists
-        for (Estado e : this.estados) {
-            if (e.isEstadoFinal()) {
-                f.add(e);
-            } else {
-                nf.add(e);
-            }
-        }
-
-        Estado eOrigem0 = f.get(0);
-        Estado eOrigem1 = f.get(1);
-
-        Estado eDestino0 = null;
-        Estado eDestino1 = null;
-        
-        //cria Strings temporarias para comparar se transicoes sao da mesma classe
-        String qa=null;
-        String qb=null;
-        for(int i=0; i<this.estados.size(); i++)
-            //comeca comparando elementos da CE dos estados finais se houver mais de 1 elemento
-            if(f.size()>1){
-                
-                if(tabela[i+1][0].equals(f.get(0).getId())){
-                    qa=tabela[i+1][1];
+        if (f.size() > 1) {
+            //iteracao para comparacao com estado de origem das transicoes
+            for (int i = 0; i < this.transicoes.size(); i++) {
+                Transicao t = transicoes.get(i);
+                if (f.get(contK) == t.getEstadoOrigem() && t.getSimbolo().equals(this.simbolos.get(contSimbolos))) {
+                    trans.add(t);
+                    contK++;
                 }
-                
             }
-            //se a CE dos estados finais só contem 1 elemento, compara os elementos da CE dos nao finais
-            //apenas se houver mais de 1 elemento
-            else{
-                
+
+            for (int i = 0; i < this.transicoes.size(); i++) {
+                Transicao t = transicoes.get(i);
+                if (f.get(contK) == t.getEstadoOrigem() && t.getSimbolo().equals(this.simbolos.get(contSimbolos))) {
+                    trans.add(t);
+                    contK++;
+                }
             }
-        
-        
+
+        } else if (nf.size() > 1) {
+        } else {
+        }
+
+        //if(ta.)
+
+
+
     }
 
     /**

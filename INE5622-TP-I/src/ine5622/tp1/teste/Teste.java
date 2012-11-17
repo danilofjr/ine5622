@@ -128,13 +128,85 @@ public class Teste {
         Transicao t14 = new Transicao(q7, q7, "a");
         Transicao t15 = new Transicao(q7, q3, "b");
         
-        //CONTINUAR... INCOMPLETO
+        //define os estados alcancaveis a partir do estado q
+        ArrayList<Transicao> tq0 = new ArrayList();
+        tq0.add(t0);
+        tq0.add(t1);        
+        ArrayList<Transicao> tq1 = new ArrayList();
+        tq1.add(t2);
+        tq1.add(t3);        
+        ArrayList<Transicao> tq2 = new ArrayList();
+        tq2.add(t4);
+        tq2.add(t5);        
+        ArrayList<Transicao> tq3 = new ArrayList();
+        tq3.add(t6);
+        tq3.add(t7);        
+        ArrayList<Transicao> tq4 = new ArrayList();
+        tq4.add(t8);
+        tq4.add(t9);        
+        ArrayList<Transicao> tq5 = new ArrayList();
+        tq5.add(t10);
+        tq5.add(t11);        
+        ArrayList<Transicao> tq6 = new ArrayList();
+        tq6.add(t12);
+        tq6.add(t13);        
+        ArrayList<Transicao> tq7 = new ArrayList();
+        tq7.add(t14);
+        tq7.add(t15);        
+        
+        //Cria objetos necessarios para criar o AF
+        ArrayList<Estado> estados = new ArrayList(); //estados do automato
+        estados.add(q0);
+        estados.add(q1);
+        estados.add(q2);
+        estados.add(q3);
+        estados.add(q4);
+        estados.add(q5);
+        estados.add(q6);
+        estados.add(q7);
+        ArrayList<Transicao> transicoes = new ArrayList(); //transicoes do automato
+        transicoes.add(t0);
+        transicoes.add(t1);
+        transicoes.add(t2);
+        transicoes.add(t3);
+        transicoes.add(t4);
+        transicoes.add(t5);
+        transicoes.add(t6);
+        transicoes.add(t7);
+        transicoes.add(t8);
+        transicoes.add(t9);
+        transicoes.add(t10);
+        transicoes.add(t11);
+        transicoes.add(t12);
+        transicoes.add(t13);
+        transicoes.add(t14);
+        transicoes.add(t15);
+        
+        //Cria o AFND
+        //AutomatoFinito(ArrayList<Estado> estados, ArrayList<Transicao> transicoes)
+        AutomatoFinito afnd = new AutomatoFinito(estados, transicoes);
+
+        //Imprime o automato de forma tabular
+        afnd.toString();
+        //Imprime as transicoes do automato
+        for (Transicao t : transicoes) {
+            System.out.println(t.toString());
+        }
+        
+        afnd.verificaEstadosAlcancaveis();
+        afnd.verificaEstadosVivos();
+        afnd.eliminaEstadosInalcancaveis();
+        afnd.eliminaEstadosMortos();
+        
+        afnd.toString();
+        
+        
     }
 
     public static void main(String[] args) {
         
         //testa determinizacao
-        criaAFND();
+        //criaAFND();
         
         //testa minimizacao
         criaAF();
