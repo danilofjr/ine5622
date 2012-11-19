@@ -200,6 +200,14 @@ public class Teste {
         
         afnd.toString();
         
+        afnd.classesDeEquivalencia3();
+        
+        //afnd.minimiza();
+        
+        //afnd.classesDeEquivalencia();
+        
+        ///afnd.printTEMP(afnd.classesDeEquivalencia());
+        
         
     }
 

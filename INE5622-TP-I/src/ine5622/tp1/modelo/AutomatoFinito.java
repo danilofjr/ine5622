@@ -151,14 +151,14 @@ public class AutomatoFinito implements Serializable {
                 if (!this.estadosAlcancaveis.contains(t.getEstadoDestino())) {
                     this.estadosAlcancaveis.add(t.getEstadoDestino());
                 }
-            }            
+            }
         }
 
-        System.out.println("---");
-        for (Estado e : this.estadosAlcancaveis) {
-            System.out.println(e.toString());
-        }
-        System.out.println("---até aqui esta correto---");
+//        System.out.println("---");
+//        for (Estado e : this.estadosAlcancaveis) {
+//            System.out.println(e.toString());
+//        }
+//        System.out.println("---até aqui esta correto---");
 
         //passa 3 vezes para garantir que encontrou todos os estados alcancaveis
         int cont = 0;
@@ -181,9 +181,9 @@ public class AutomatoFinito implements Serializable {
                 }
             }
             this.estadosAlcancaveis = estadosAlcancaveisTemp;
-            for (Estado e : this.estadosAlcancaveis) {
-                System.out.println(e.toString());
-            }
+//            for (Estado e : this.estadosAlcancaveis) {
+//                System.out.println(e.toString());
+//            }
             cont++;
         }
 //        for(Estado e : this.estadosAlcancaveis){
@@ -212,8 +212,8 @@ public class AutomatoFinito implements Serializable {
         //faz uma cópia de estadosVivos        
         //o codigo ArrayList<Estado> estadosVivosTemp=this.estadosVivos nao copia o array estadosVivos
         //para o array estadosVivosTemp, e sim vincula o primeiro ao segundo. Resulta em erro por acesso concorrente.
-        ArrayList<Estado> estadosVivosTemp=new ArrayList();
-        for (Estado e : this.estadosAlcancaveis){
+        ArrayList<Estado> estadosVivosTemp = new ArrayList();
+        for (Estado e : this.estadosAlcancaveis) {
             estadosVivosTemp.add(e);
         }
         //procura novos estados vivos a partir do list de estados vivos
@@ -226,7 +226,7 @@ public class AutomatoFinito implements Serializable {
                 }
             }
         }
-        this.estadosVivos=estadosVivosTemp;
+        this.estadosVivos = estadosVivosTemp;
 //        for(Estado e : this.estadosVivos){
 //            System.out.println(e.toString());
 //        }
@@ -241,10 +241,10 @@ public class AutomatoFinito implements Serializable {
     public void eliminaEstadosInalcancaveis() {
         //faz a intersecção entre as lists 'estados' e 'estadosAlcancaveis'
         this.estados.retainAll(this.estadosAlcancaveis);
-        
+
         //faz uma cópia de transicoes                
-        ArrayList<Transicao> transicoesTemp=new ArrayList();
-        for (Transicao t : this.transicoes){
+        ArrayList<Transicao> transicoesTemp = new ArrayList();
+        for (Transicao t : this.transicoes) {
             transicoesTemp.add(t);
         }
         //elimina as transicoes de estados inalcancaveis
@@ -255,7 +255,7 @@ public class AutomatoFinito implements Serializable {
                 }
             }
         }
-        this.transicoes=transicoesTemp;        
+        this.transicoes = transicoesTemp;
     }
 
     /**
@@ -267,10 +267,10 @@ public class AutomatoFinito implements Serializable {
     public void eliminaEstadosMortos() {
         //faz a intersecção entre as lists 'estados' e 'estadosVivos'
         this.estados.retainAll(this.estadosVivos);
-        
+
         //faz uma cópia de transicoes                
-        ArrayList<Transicao> transicoesTemp=new ArrayList();
-        for (Transicao t : this.transicoes){
+        ArrayList<Transicao> transicoesTemp = new ArrayList();
+        for (Transicao t : this.transicoes) {
             transicoesTemp.add(t);
         }
         //elimina as transicoes de estados vivos
@@ -281,67 +281,522 @@ public class AutomatoFinito implements Serializable {
                 }
             }
         }
-        this.transicoes=transicoesTemp;  
+        this.transicoes = transicoesTemp;
     }
 
-    //###teste criacao de CE com objetos
-    public void classesDeEquivalencia() {
-        //list que armazena lists que representam classes de equivalencia (CE)
+    public ArrayList<ArrayList> classesDeEquivalencia() {
+        //list que armazena lists que representam P de equivalencia (CE)
         ArrayList<ArrayList> classes = new ArrayList();
         //list de estados finais
-        ArrayList<Estado> f = new ArrayList();
+        ArrayList<Estado> finais = new ArrayList();
         //list de estados nao-finais
-        ArrayList<Estado> nf = new ArrayList();
+        ArrayList<Estado> naoFinais = new ArrayList();
+
+//        P.add(finais);
+//        P.add(naoFinais);        
 
         //separa os estados finais dos nao finais, adicionandos nas respectivas lists
         for (Estado e : this.estados) {
             if (e.isEstadoFinal()) {
-                f.add(e);
+                finais.add(e);
             } else {
-                nf.add(e);
+                naoFinais.add(e);
             }
         }
 
-        //variaveis para controlar a iteracao nos arrays this.estados, this.transicoes, this.simbolos e um dos arrays de CE
-        int contEstados = 0;
-        int contTransicoes = 0;
-        int contSimbolos = 0;
-        int contK = 0;
+        ArrayList<Estado> temp = new ArrayList();
+        //int contSimbolos=0;       
+        if (finais.size() > 1) {
+            for (int i = 0; i < finais.size(); i++) {
+                Estado e0 = finais.get(0);
+                Estado e1 = finais.get(i);
+                //String s = this.simbolos.get(contSimbolos);                                
 
-        //transicoes temporarias para comparacao
-        Transicao ta = null;
-        Transicao tb = null;
-
-        //armazena temporariamente transicoes de dois estados para comparacao       
-        ArrayList<Transicao> trans = new ArrayList();
-
-
-        if (f.size() > 1) {
-            //iteracao para comparacao com estado de origem das transicoes
-            for (int i = 0; i < this.transicoes.size(); i++) {
-                Transicao t = transicoes.get(i);
-                if (f.get(contK) == t.getEstadoOrigem() && t.getSimbolo().equals(this.simbolos.get(contSimbolos))) {
-                    trans.add(t);
-                    contK++;
+                //percorre os simbolos do alfabeto
+                for (int j = 0; j < this.simbolos.size(); j++) {
+                    //percorre as transicoes do automato
+                    for (Transicao t : this.transicoes) {
+                        //compara se o estado de origem de uma transicao é igual ao primeiro estado do par de estados para comparacao
+                        if (t.getEstadoOrigem() == e0 && t.getSimbolo().equals(this.simbolos.get(j))) {
+                            temp.add(t.getEstadoDestino());
+                        }
+                        if (t.getEstadoOrigem() == e1 && t.getSimbolo().equals(this.simbolos.get(j))) {
+                            temp.add(t.getEstadoDestino());
+                        }
+                    }
+                    //se o list de finais nao contem ambos, cria uma nova CE e adiciona ao array de CE
+                    if (!finais.containsAll(temp)) {
+                        finais.remove(e1);
+                        if (!naoFinais.contains(e1)) {
+                            boolean contem = false;
+                            for (int m = 0; m < classes.size(); m++) {
+                                for (int n = 0; n < classes.get(m).size(); n++) {
+                                    if (classes.get(m).get(n) == e1) {
+                                        contem = true;
+                                    }
+                                }
+                            }
+                            if (!contem) {
+                                ArrayList<Estado> novaClasse = new ArrayList();
+                                novaClasse.add(e1);
+                                classes.add(novaClasse);
+                            }
+                        }
+                    }
+                    temp.clear();
                 }
             }
 
-            for (int i = 0; i < this.transicoes.size(); i++) {
-                Transicao t = transicoes.get(i);
-                if (f.get(contK) == t.getEstadoOrigem() && t.getSimbolo().equals(this.simbolos.get(contSimbolos))) {
-                    trans.add(t);
-                    contK++;
-                }
-            }
-
-        } else if (nf.size() > 1) {
-        } else {
         }
+        if (naoFinais.size() > 0) {
+            for (int i = 0; i < naoFinais.size(); i++) {
+                Estado e0 = naoFinais.get(0);
+                Estado e1 = naoFinais.get(i);
+                //String s = this.simbolos.get(contSimbolos);                                
 
-        //if(ta.)
+                //percorre os simbolos do alfabeto
+                for (int j = 0; j < this.simbolos.size(); j++) {
+                    //percorre as transicoes do automato
+                    for (Transicao t : this.transicoes) {
+                        //compara se o estado de origem de uma transicao é igual ao primeiro estado do par de estados para comparacao
+                        if (t.getEstadoOrigem() == e0 && t.getSimbolo().equals(this.simbolos.get(j))) {
+                            temp.add(t.getEstadoDestino());
+                        }
+                        if (t.getEstadoOrigem() == e1 && t.getSimbolo().equals(this.simbolos.get(j))) {
+                            temp.add(t.getEstadoDestino());
+                        }
+                    }
+                    //se o list de finais nao contem ambos, cria uma nova CE e adiciona ao array de CE
+                    if (!naoFinais.containsAll(temp)) {
+                        naoFinais.remove(e1);
+                        if (!finais.contains(e1)) {
+                            boolean contem = false;
+                            for (int m = 0; m < classes.size(); m++) {
+                                for (int n = 0; n < classes.get(m).size(); n++) {
+                                    if (classes.get(m).get(n) == e1) {
+                                        contem = true;
+                                    }
+                                }
+                            }
+                            if (!contem) {
+                                ArrayList<Estado> novaClasse = new ArrayList();
+                                novaClasse.add(e1);
+                                classes.add(novaClasse);
+                            }
+                        }
+                    }
+                    temp.clear();
+                }
+            }
+        }
+        printTEMP(classes);
+        return classes;
+    }
+    
+//    public ArrayList<ArrayList> classesDeEquivalencia2() {
+//        //list que armazena lists que representam P de equivalencia (CE)
+//        ArrayList<ArrayList> P = new ArrayList();
+//        //list de estados finais
+//        ArrayList<Estado> finais = new ArrayList();
+//        //list de estados nao-finais
+//        ArrayList<Estado> naoFinais = new ArrayList();
+//        //copia da list de estados finais
+//        ArrayList<ArrayList> W = new ArrayList();
+//
+//        //separa os estados finais dos nao finais, adicionandos nas respectivas lists
+//        for (Estado e : this.estados) {
+//            if (e.isEstadoFinal()) {
+//                finais.add(e);
+//            } else {
+//                naoFinais.add(e);
+//            }
+//        }
+//        P.add(finais);
+//        P.add(naoFinais);
+//        //faz a copia da list de estados finais        
+//        W.add(finais);
+//
+//        while (!W.isEmpty()) {
+//            ArrayList<Estado> A = W.get(0); 
+////            for(ArrayList<Estado> array : W){
+////                A.add(array.get(0));
+////            }
+//            Estado e0 = (Estado) W.get(0).get(0);
+//            Estado e1 = (Estado) W.get(0).get(1);
+//            //A.add(e0);
+//            //A.add(e1);            
+//            W.remove(A);
+//            
+//            for (String c : this.simbolos) {
+//                ArrayList<Estado> X = new ArrayList();
+//                //let X é o conjunto de estados para o qual uma transição sobre c leva a um estado em A
+//                for (Transicao t : this.transicoes) {
+//                    if (t.getSimbolo().equals(c) && (t.getEstadoDestino() == A.get(0) || t.getEstadoDestino() == A.get(1))) {
+//                        X.add(t.getEstadoDestino());
+//                    }
+//                }
+//                //for each conjunto Y in P para o qual X ∩ Y é não-vazio do
+//                for (int i = 0; i < P.size(); i++) {
+//                    ArrayList<Estado> Y = P.get(i);
+//                    ArrayList<Estado> XintersecY = new ArrayList();
+//                    ArrayList<Estado> YdifX = new ArrayList();
+//                    for (Estado e : X) {
+//                        XintersecY.add(e);
+//                        YdifX.add(e);
+//                    }
+//                    if (XintersecY.retainAll(Y)) {
+//                        P.set(P.indexOf(Y), XintersecY);
+//                        YdifX.removeAll(Y);
+//                        P.add(YdifX);
+//                        if (W.containsAll(Y)) {                            
+//                            W.set(W.indexOf(Y), XintersecY);
+//                            W.add(YdifX);
+//                        } else {
+//                            if (XintersecY.size() < YdifX.size()) {
+//                                W.add(XintersecY);
+//                            } else {
+//                                W.add(YdifX);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return P;
+//    }
+    
+    public ArrayList<ArrayList> classesDeEquivalencia3() {
+        //list que armazena lists que representam P de equivalencia (CE)
+        ArrayList<ArrayList> P = new ArrayList();
+        //list de estados finais
+        ArrayList<Estado> finais = new ArrayList();
+        //list de estados nao-finais
+        ArrayList<Estado> naoFinais = new ArrayList();
+        //copia da list de estados finais
+        ArrayList<ArrayList> W = new ArrayList();
 
+        //separa os estados finais dos nao finais, adicionandos nas respectivas lists
+        for (Estado e : this.estados) {
+            if (e.isEstadoFinal()) {
+                finais.add(e);
+            } else {
+                naoFinais.add(e);
+            }
+        }
+        P.add(finais);
+        P.add(naoFinais);
+        //faz a copia da list de estados finais        
+        W.add(finais);
 
+        while (!W.isEmpty()) {
+            ArrayList<Estado> A = W.get(0);             
+            W.remove(A);
+            
+            for (String c : this.simbolos) {
+                ArrayList<Estado> X = new ArrayList();
+                //let X é o conjunto de estados para o qual uma transição sobre c leva a um estado em A
+                for (Transicao t : this.transicoes) {
+                    if (t.getSimbolo().equals(c) && (t.getEstadoDestino() == A.get(0) || t.getEstadoDestino() == A.get(1))) {
+                        X.add(t.getEstadoDestino());
+                    }
+                }
+                //for each conjunto Y in P para o qual X ∩ Y é não-vazio do
+                for (int i = 0; i < P.size(); i++) {
+                    ArrayList<Estado> Y = P.get(i);
+                    ArrayList<Estado> XintersecY = new ArrayList();
+                    ArrayList<Estado> YdifX = new ArrayList();
+                    for (Estado e : X) {
+                        XintersecY.add(e);
+                        YdifX.add(e);
+                    }
+                    if (XintersecY.retainAll(Y)) {
+                        P.set(P.indexOf(Y), XintersecY);
+                        YdifX.removeAll(Y);
+                        P.add(YdifX);
+                        if (W.containsAll(Y)) {                            
+                            W.set(W.indexOf(Y), XintersecY);
+                            W.add(YdifX);
+                        } else {
+                            if (XintersecY.size() <= YdifX.size()) {
+                                W.add(XintersecY);
+                            } else {
+                                W.add(YdifX);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return P;
+    }
 
+//    //############################
+//    public void minimiza() {
+//        ArrayList classesEquivalencia = new ArrayList();
+//
+//        eliminaEstadosMortos();
+//        eliminaEstadosInalcancaveis();
+//
+////        int retAfd = transformaEmAFD(null, 0).nrEstadosAlterados;
+////        if (retAfd > 0) {
+////            eliminaEstadosMortos();
+////            eliminaEstadosInalcancaveis();
+////        }
+//
+//        //ArrayList transicoes = this.automatoAtual.getMatrizTransicoes().getTransicoes();
+//        //ArrayList estados = this.automatoAtual.getEstados();
+//
+//        for (int i = 0; i < this.estados.size(); i++) {
+//            String estadoAtual = this.estados.get(i).getId();
+//            ClasseEstado classeAtual;
+//            if (estados.get(i).isEstadoFinal()) {
+//                classeAtual = new ClasseEstado(estadoAtual, "r", "r");
+//            } else {
+//                classeAtual = new ClasseEstado(estadoAtual, "n", "n");
+//            }
+//            classesEquivalencia.add(classeAtual);
+//        }
+//
+//        boolean modificado = true;
+//        while (modificado) {
+//            modificado = false;
+//
+//            for (int i = 0; i < classesEquivalencia.size(); i++) {
+//                ClasseEstado classeEstadoAtual = (ClasseEstado) classesEquivalencia.get(i);
+//                classeEstadoAtual.verificada = false;
+//                classesEquivalencia.set(i, classeEstadoAtual);
+//            }
+//
+//            for (int i = 0; i < classesEquivalencia.size(); i++) {
+//                ClasseEstado primClasseEstado = (ClasseEstado) classesEquivalencia.get(i);
+//
+//                if (primClasseEstado.verificada) {
+//                    continue;
+//                }
+//                ArrayList transicoesPrimEst = retornaTransicoesEstado(transicoes, primClasseEstado.nomeEstado, null);
+//
+//                String classeAntEstadoAtual = primClasseEstado.nomeClasseAtual;
+//                primClasseEstado.nomeClasseAnterior = primClasseEstado.nomeClasseAtual;
+//                primClasseEstado.nomeClasseAtual = primClasseEstado.nomeEstado;
+//                primClasseEstado.verificada = true;
+//                classesEquivalencia.set(i, primClasseEstado);
+//
+//                for (int j = i + 1; j < classesEquivalencia.size(); j++) {
+//                    ClasseEstado segClasseEstado = (ClasseEstado) classesEquivalencia.get(j);
+//
+//                    if (segClasseEstado.verificada) {
+//                        continue;
+//                    }
+//                    ArrayList transicoesSegEst = retornaTransicoesEstado(transicoes, segClasseEstado.nomeEstado, null);
+//
+//                    if (!primClasseEstado.nomeClasseAnterior.equals(segClasseEstado.nomeClasseAtual)) {
+//                        continue;
+//                    }
+//
+//                    if (transicoesSegEst.size() == transicoesPrimEst.size()) {
+//                        boolean classesIguais = true;
+//
+//                        for (int t1 = 0; t1 < transicoesPrimEst.size(); t1++) {
+//                            Transicao tr1 = (Transicao) transicoesPrimEst.get(t1);
+//                            Transicao tr2 = null;
+//                            boolean transicao_encontrada = false;
+//                            int indT2 = 0;
+//                            while ((!transicao_encontrada) && (indT2 < transicoesSegEst.size())) {
+//                                tr2 = (Transicao) transicoesSegEst.get(indT2);
+//                                if (tr2.getEstadoOrigem().equals(tr1.getSimbolo())) {
+//                                    transicao_encontrada = true;
+//                                } else {
+//                                    indT2++;
+//                                }
+//                            }
+//
+//                            if (transicao_encontrada) {
+//                                String classeEq1;
+//                                if (isAlocadoEmClasse(classesEquivalencia, tr1.getEstadoDestino().getId(), primClasseEstado.nomeClasseAtual)) {
+//                                    classeEq1 = retornaClasseEquivalenciaAnterior(classesEquivalencia, tr1.getEstadoDestino().getId());
+//                                } else {
+//                                    classeEq1 = retornaClasseEquivalenciaAtual(classesEquivalencia, tr1.getEstadoDestino().getId());
+//                                }
+//                                String classeEq2;
+//                                if (isAlocadoEmClasse(classesEquivalencia, tr2.getEstadoDestino().getId(), primClasseEstado.nomeClasseAtual)) {
+//                                    classeEq2 = retornaClasseEquivalenciaAnterior(classesEquivalencia, tr2.getEstadoDestino().getId());
+//                                } else {
+//                                    classeEq2 = retornaClasseEquivalenciaAtual(classesEquivalencia, tr2.getEstadoDestino().getId());
+//                                }
+//
+//                                if (!classeEq2.equals(classeEq1)) {
+//                                    classesIguais = false;
+//                                }
+//                            } else {
+//                                classesIguais = false;
+//                            }
+//
+//                        }
+//
+//                        if (classesIguais) {
+//                            if (!segClasseEstado.nomeClasseAtual.equals(primClasseEstado.nomeClasseAtual)) {
+//                                segClasseEstado.nomeClasseAnterior = segClasseEstado.nomeClasseAtual;
+//
+//                                segClasseEstado.nomeClasseAtual = primClasseEstado.nomeClasseAtual;
+//                                segClasseEstado.verificada = true;
+//                                modificado = true;
+//                            } else {
+//                                segClasseEstado.nomeClasseAnterior = segClasseEstado.nomeClasseAtual;
+//                                segClasseEstado.verificada = true;
+//                            }
+//
+//                            classesEquivalencia.set(j, segClasseEstado);
+//                        } else {
+//                            modificado = true;
+//                        }
+//
+//                    } else {
+//                        modificado = true;
+//                    }
+//
+//                }
+//
+//                primClasseEstado.nomeClasseAnterior = classeAntEstadoAtual;
+//                classesEquivalencia.set(i, primClasseEstado);
+//            }
+//
+//        }
+//        System.out.println(classesEquivalencia);
+//
+//        int nrEliminados = reduzEstadosEquivalentes(classesEquivalencia, transicoes);
+//        //renomeiaEstados(this);
+//        //return nrEliminados;
+//    }
+//    
+//    public static ArrayList retornaTransicoesEstado(ArrayList trans, String estadoAtual, String valorEnt) {
+//        ArrayList transicoesEstadoAtual = new ArrayList();
+//
+//        for (int i = 0; i < trans.size(); i++) {
+//            Transicao tr = (Transicao) trans.get(i);
+//
+//            if (!tr.getEstadoOrigem().equals(estadoAtual)) {
+//                continue;
+//            }
+//            if (valorEnt != null) {
+//                if (tr.getSimbolo().equals(valorEnt)) {
+//                    transicoesEstadoAtual.add(tr);
+//                }
+//            } else {
+//                transicoesEstadoAtual.add(tr);
+//            }
+//        }
+//
+//        return transicoesEstadoAtual;
+//    }
+//    
+//    private boolean isAlocadoEmClasse(ArrayList vetorClasses, String estadoAtual, String nomeClasseAlocado) {
+//        for (int i = 0; i < vetorClasses.size(); i++) {
+//            ClasseEstado ca = (ClasseEstado) vetorClasses.get(i);
+//            if (ca.nomeEstado.equals(estadoAtual)) {
+//                return ca.verificada;
+//            }
+//
+//        }
+//        return false;
+//    }
+//    
+//    private String retornaClasseEquivalenciaAnterior(ArrayList vetorClasses, String estadoAtual) {
+//        for (int i = 0; i < vetorClasses.size(); i++) {
+//            ClasseEstado ca = (ClasseEstado) vetorClasses.get(i);
+//            if (ca.nomeEstado.equals(estadoAtual)) {
+//                return ca.nomeClasseAnterior;
+//            }
+//        }
+//        return null;
+//    }
+//    
+//    private String retornaClasseEquivalenciaAtual(ArrayList vetorClasses, String estadoAtual) {
+//        for (int i = 0; i < vetorClasses.size(); i++) {
+//            ClasseEstado ca = (ClasseEstado) vetorClasses.get(i);
+//            if (ca.nomeEstado.equals(estadoAtual)) {
+//                return ca.nomeClasseAtual;
+//            }
+//        }
+//        return null;
+//    }
+//    
+//    private int reduzEstadosEquivalentes(ArrayList classesEquivalencia, ArrayList transicoes) {
+//        int nrEliminados = 0;
+//
+//        for (int i = 0; i < classesEquivalencia.size(); i++) {
+//            ClasseEstado classeEstadoAtual = (ClasseEstado) classesEquivalencia.get(i);
+//            classeEstadoAtual.verificada = false;
+//            classesEquivalencia.set(i, classeEstadoAtual);
+//        }
+//
+//        for (int i = 0; i < classesEquivalencia.size(); i++) {
+//            ClasseEstado ce1 = (ClasseEstado) classesEquivalencia.get(i);
+//
+//            if (ce1.verificada) {
+//                continue;
+//            }
+//            for (int j = i + 1; j < classesEquivalencia.size(); j++) {
+//                ClasseEstado ce2 = (ClasseEstado) classesEquivalencia.get(j);
+//
+//                if (!ce2.nomeClasseAtual.equals(ce1.nomeClasseAtual)) {
+//                    continue;
+//                }
+//                for (int t = 0; t < transicoes.size(); t++) {
+//                    Transicao tr = (Transicao) transicoes.get(t);
+//                    Estado orig = tr.getEstadoOrigem();
+//                    Estado dest = tr.getEstadoDestino();
+//
+//                    if (ce2.nomeEstado.equals(tr.getEstadoOrigem())) {
+//                        for(Estado e : this.estados){
+//                            if(e.getId().equals(ce1.nomeClasseAtual)){
+//                                orig=e;
+//                            }
+//                        }                        
+//                    }
+//
+//                    if (ce2.nomeEstado.equals(tr.getEstadoDestino())) {
+//                        for(Estado e : this.estados){
+//                            if(e.getId().equals(ce1.nomeClasseAtual)){
+//                                dest=e;
+//                            }
+//                        }                       
+//                    }
+//                    Transicao tr1= new Transicao(orig, dest, tr.getSimbolo());
+//                    //this.automatoAtual.criaTransicao(orig, , dest);
+//                }
+//
+//                ce2.verificada = true;
+//                classesEquivalencia.set(j, ce2);
+//                
+//                ArrayList<Estado> A= new ArrayList();
+//                for(Estado e : this.estados){
+//                    A.add(e);
+//                }
+//                
+//                for(Estado e : A){
+//                    if(e.getId().equals(ce2.nomeEstado)){
+//                       this.removeEstado(e);
+//                        nrEliminados++; 
+//                    }
+//                }
+//                
+//            }
+//
+//        }
+//
+//        return nrEliminados;
+//    }
+//
+//    //############################
+
+    public void printTEMP(ArrayList<ArrayList> temp) {
+        for (int i = 0; i < temp.size(); i++) {
+            System.out.println("---classe inicio---");
+            for (int j = 0; j < temp.get(i).size(); j++) {
+                System.out.println(temp.get(i).get(j).toString());
+            }
+            System.out.println("---classe fim---");
+        }
     }
 
     /**
@@ -443,7 +898,7 @@ public class AutomatoFinito implements Serializable {
                     formatter = new Formatter();
                     String dado = "";
                     if (tabela[linha][coluna] == null) {
-                        dado = "-";
+                        dado = "&";
                     } else {
                         dado = tabela[linha][coluna];
                     }
